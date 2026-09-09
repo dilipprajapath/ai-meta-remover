@@ -1,0 +1,13 @@
+# build artifacts
+build/
+dist/
+*.spec.bak
+*.pyc
+__pycache__/
+*.pyo
+
+# local tooling noise
+.venv/
+venv/
+.env
+.pytest_cache/

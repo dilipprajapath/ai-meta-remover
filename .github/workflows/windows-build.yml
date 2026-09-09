@@ -1,0 +1,83 @@
+name: build-windows-exe
+
+# Builds the single-file Windows .exe + Inno Setup installer whenever you push
+# to main or create a release tag. Artifacts can be downloaded from the
+# workflow run page ("Actions" tab) or attached to releases.
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:      # lets you run it manually from the Actions tab
+
+jobs:
+  test-and-build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        # Python 3.12 -> also bundles the native desktop window (pywebview).
+        # Python 3.14 -> engine validated + browser-mode exe (pythonnet, the
+        # native-window dependency, has no stable Python 3.14 wheels yet).
+        python-version: ["3.12", "3.14"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install pinned dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Run engine test-suite
+        run: python -m pytest tests -q
+
+      - name: Build single-file .exe with PyInstaller
+        run: |
+          python -m PyInstaller --noconfirm --clean AI-Metadata-Remover.spec
+
+      - name: Smoke-test the frozen exe (headless)
+        shell: pwsh
+        run: |
+          $proc = Start-Process -FilePath "dist\AI-Metadata-Remover.exe" `
+              -ArgumentList "--no-browser","--port","8799" `
+              -PassThru -WindowStyle Hidden
+          try {
+            Start-Sleep -Seconds 14
+            $health = Invoke-WebRequest -Uri "http://127.0.0.1:8799/api/health" -UseBasicParsing
+            Write-Host $health.Content
+            if ($health.StatusCode -ne 200) { throw "health check failed" }
+            $page = Invoke-WebRequest -Uri "http://127.0.0.1:8799/" -UseBasicParsing
+            if ($page.StatusCode -ne 200 -or $page.Content -notmatch "AI Metadata Remover") {
+              throw "UI did not render"
+            }
+          } finally {
+            Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+          }
+
+      - name: Verify native-window dependency (Python 3.12 only)
+        if: matrix.python-version == '3.12'
+        run: python -c "import webview; print('pywebview', webview.__version__)"
+
+      - name: Install Inno Setup and build installer
+        shell: pwsh
+        run: |
+          choco install innosetup --no-progress -y
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          & $iscc "scripts\AI-Metadata-Remover.iss"
+          Get-ChildItem dist -Recurse -File | Select-Object FullName, Length
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-x64-py${{ matrix.python-version }}
+          path: |
+            dist/AI-Metadata-Remover.exe
+            dist/installer/*.exe
+          if-no-files-found: error
