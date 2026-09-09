@@ -204,7 +204,10 @@ def launch(url: str, title: str = "AI Metadata Remover",
         url=url, title=title,
         width=1180, height=820, min_size=(900, 620),
         js_api=api, easy_drag=False,
-        background_color="#0d1117",
+        # Painted by the native window before the page renders — keep it in
+        # step with --bg in static/style.css or the window flashes the old
+        # colour on every launch.
+        background_color="#0b0e14",
     )
     try:
         window = webview.create_window(**kwargs)

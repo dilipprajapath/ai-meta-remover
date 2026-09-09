@@ -79,6 +79,13 @@ APP_TTL_SECONDS = float(os.environ.get("AI_STORE_TTL", str(30 * 60)))
 SERVERLESS = bool(os.environ.get("VERCEL") or
                   os.environ.get("AI_SERVERLESS"))
 
+# Vercel rejects a request body over 4.5 MB at the platform edge, before the
+# function is ever invoked — the client gets a bare 413 that this app cannot
+# catch or explain. So the limit is published via /api/health and the UI stops
+# oversized batches locally instead of letting the user wait through an upload
+# that is guaranteed to fail. Headroom covers multipart boundaries and fields.
+SERVERLESS_MAX_UPLOAD_BYTES = 4_300_000
+
 # Set to True by the native desktop host (app/desktop.py) — lets the frontend
 # know it can use the window.pywebview bridge instead of browser downloads.
 IN_DESKTOP = False
@@ -143,6 +150,8 @@ def create_app() -> Flask:
             "processed_in_memory": True,
             "offline": not SERVERLESS,
             "serverless": SERVERLESS,
+            "max_upload_bytes": (SERVERLESS_MAX_UPLOAD_BYTES if SERVERLESS
+                                 else MAX_MB * 1024 * 1024),
             "host": "127.0.0.1" if not SERVERLESS else "serverless",
             "desktop_bridge": _desktop_bridge_available(),
         })

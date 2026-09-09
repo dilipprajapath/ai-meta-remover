@@ -43,6 +43,19 @@ async function checkDesktopMode() {
   } catch (_) {}
 }
 
+/* Ask the backend how much it will actually accept. The desktop build allows
+   ~300 MB; a hosted deployment is capped far lower by the platform. */
+async function loadLimits() {
+  try {
+    const resp = await fetch("/api/health");
+    const data = await resp.json();
+    if (typeof data.max_upload_bytes === "number") {
+      state.maxUpload = data.max_upload_bytes;
+      syncGo();
+    }
+  } catch (_) { /* leave maxUpload at 0 = no client-side limit */ }
+}
+
 const state = {
   files: [],        // {file, url, ext}
   mode: "ai",
@@ -52,6 +65,10 @@ const state = {
      as base64 instead of stashing it server-side, because a follow-up request
      may hit a different, cold instance. rid -> {bytes, mime, name, report}. */
   payloads: {},
+  /* Largest total upload the backend will accept, from /api/health. Hosted
+     deployments cap this well below the desktop build's limit. 0 = not known
+     yet, in which case no client-side limit is enforced. */
+  maxUpload: 0,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -77,6 +94,7 @@ function toast(msg, kind) {
 
 document.addEventListener("DOMContentLoaded", () => {
   checkDesktopMode();
+  loadLimits();
 
   const dz = $("dropzone"), input = $("fileInput");
   dz.addEventListener("click", () => input.click());
@@ -124,8 +142,11 @@ function addFiles(fileList) {
     const url = (f.type && f.type.startsWith("image/")) ? URL.createObjectURL(f) : "";
     accepted.push({ file: f, url, ext });
   }
-  if (errors.length) $("uploadError").textContent = errors.join(" ");
-  else $("uploadError").textContent = "";
+  // The element carries .hidden in the markup, so toggling it is what makes
+  // these warnings visible at all.
+  const box = $("uploadError");
+  box.textContent = errors.length ? errors.join(" ") : "";
+  box.classList.toggle("hidden", errors.length === 0);
   state.files.push(...accepted);
   renderThumbs();
   syncGo();
@@ -171,8 +192,31 @@ function renderThumbs() {
 }
 
 /* ---------------------------------------------------------------- process */
+function totalBytes() {
+  return state.files.reduce((n, it) => n + it.file.size, 0);
+}
+
+function overLimit() {
+  return state.maxUpload > 0 && totalBytes() > state.maxUpload;
+}
+
 function syncGo() {
-  $("goBtn").disabled = state.processing || state.files.length === 0;
+  $("goBtn").disabled = state.processing || state.files.length === 0 || overLimit();
+
+  // Say so up front rather than letting the user wait through an upload the
+  // server is going to reject.
+  const box = $("uploadError");
+  if (overLimit()) {
+    const mb = (n) => (n / 1048576).toFixed(1) + " MB";
+    box.textContent =
+      `Selected files total ${mb(totalBytes())}, over this deployment's ` +
+      `${mb(state.maxUpload)} limit. Remove some files, or use the desktop ` +
+      `app — it has no practical size limit and never uploads anything.`;
+    box.classList.remove("hidden");
+  } else if (box.textContent.startsWith("Selected files total")) {
+    box.textContent = "";
+    box.classList.add("hidden");
+  }
 }
 
 async function process() {
