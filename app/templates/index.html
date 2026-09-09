@@ -16,10 +16,20 @@
       <img src="/static/icon.png" class="brand-logo" alt="AI Metadata Remover Logo" width="44" height="44">
       <div>
         <h1>AI Metadata Remover</h1>
+        {% if serverless %}
+        <p class="tagline">Strip AI / C2PA signatures from images — with zero quality loss.</p>
+        {% else %}
         <p class="tagline">Strip AI / C2PA signatures from images — privately, offline, with zero quality loss.</p>
+        {% endif %}
       </div>
     </div>
+    {% if serverless %}
+    {# Hosted deployment: the image really is uploaded, so the offline claim
+       would be false here. State what actually happens instead. #}
+    <div class="pill hosted" title="Your image is sent to the server, cleaned in memory and never written to disk or retained."><span class="dot"></span> Processed on the server · not stored</div>
+    {% else %}
     <div class="pill offline"><span class="dot"></span> 100% offline · nothing leaves your PC</div>
+    {% endif %}
   </header>
 
   <main>
@@ -102,9 +112,15 @@
   </main>
 
   <footer>
-    <p>AI Metadata Remover · runs entirely on this computer · 
+    {% if serverless %}
+    {# No "Stop / exit" here: /api/quit is disabled on a shared host, and the
+       process is not the visitor's to stop. #}
+    <p>AI Metadata Remover · images are cleaned in memory and never stored</p>
+    {% else %}
+    <p>AI Metadata Remover · runs entirely on this computer ·
        <button class="linklike" id="stopBtn" title="Stop the app">Stop / exit</button>
     </p>
+    {% endif %}
     <p class="desktopline hidden" id="desktopLine">🪟 Running as a desktop application</p>
   </footer>
 </div>

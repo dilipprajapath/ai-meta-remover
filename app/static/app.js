@@ -102,7 +102,9 @@ document.addEventListener("DOMContentLoaded", () => {
   $("goBtn").addEventListener("click", process);
   $("zipBtn").addEventListener("click", downloadZip);
   $("saveAllBtn").addEventListener("click", nativeSaveAll);
-  $("stopBtn").addEventListener("click", stopApp);
+  // Absent in serverless mode — the template omits the Stop / exit control.
+  const stopBtn = $("stopBtn");
+  if (stopBtn) stopBtn.addEventListener("click", stopApp);
   syncGo();
 });
 

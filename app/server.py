@@ -131,7 +131,9 @@ def create_app() -> Flask:
     # ------------------------------------------------------------------ pages
     @app.get("/")
     def index():
-        return render_template("index.html")
+        # Rendered server-side (rather than patched by JS after load) so the
+        # header never briefly shows the wrong privacy claim.
+        return render_template("index.html", serverless=SERVERLESS)
 
     @app.get("/api/health")
     def health():
