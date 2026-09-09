@@ -14,10 +14,16 @@ module-level dict that a later, cold invocation would not be able to see.
 
 Path handling
 -------------
-A Vercel rewrite replaces the path the function receives: with a plain
-`/(.*) -> /api/index` rule, Flask sees "/api/index" for EVERY request, matches
-no route, and returns 404 for the whole site. So vercel.json appends the real
-path as `__vpath` and the middleware below restores it before Flask routes.
+vercel.json routes every request to this file with `routes` + `dest`, which
+hands the lambda the ORIGINAL request path — so Flask routes normally.
+
+This matters because the obvious alternative does not work: a `rewrites` rule
+of `/(.*) -> /api/index` REPLACES the path, so Flask sees "/api/index" for
+every request, matches no route, and 404s the entire site.
+
+RestoreOriginalPath below is a safety net for that second style: if a
+`__vpath` query parameter is present it is moved back into PATH_INFO. With the
+current config no such parameter is sent, so the middleware is a no-op.
 """
 
 import sys

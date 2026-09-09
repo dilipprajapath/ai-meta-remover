@@ -1,16 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "functions": {
-    "api/index.py": {
-      "memory": 1024,
-      "maxDuration": 60
-    }
-  },
-  "rewrites": [
-    {
-      "_comment": "A rewrite REPLACES the path the function sees, so Flask would receive /api/index for every request and 404. Carry the real path in __vpath; api/index.py puts it back on the WSGI environ before Flask routes.",
-      "source": "/:path*",
-      "destination": "/api/index?__vpath=/:path*"
-    }
+  "builds": [
+    { "src": "api/index.py", "use": "@vercel/python" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "api/index.py" }
   ]
 }
