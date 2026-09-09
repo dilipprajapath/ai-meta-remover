@@ -48,6 +48,10 @@ const state = {
   mode: "ai",
   lastIds: [],
   processing: false,
+  /* Serverless (Vercel) mode: /api/process returns each cleaned file inline
+     as base64 instead of stashing it server-side, because a follow-up request
+     may hit a different, cold instance. rid -> {bytes, mime, name, report}. */
+  payloads: {},
 };
 
 const $ = (id) => document.getElementById(id);
@@ -185,6 +189,17 @@ async function process() {
     const resp = await fetch("/api/process", { method: "POST", body: fd });
     const json = await resp.json();
     if (!resp.ok) throw new Error(json.error || ("HTTP " + resp.status));
+    state.payloads = {};
+    for (const r of json.results) {
+      if (r && typeof r.data === "string") {
+        state.payloads[r.id] = {
+          bytes: b64ToBytes(r.data),
+          mime: r.mime || "application/octet-stream",
+          name: r.save_name || r.original_name || "cleaned",
+          report: r.report_text || "",
+        };
+      }
+    }
     renderResults(json.results);
     state.lastIds = json.results.filter((r) => r.status !== "error").map((r) => r.id);
     if (state.lastIds.length > 1 && !isDesktop()) $("zipBtn").classList.remove("hidden");
@@ -308,6 +323,95 @@ async function bridge(method, ...args) {
   }
 }
 
+/* --- inline-payload helpers (serverless mode) ------------------------------
+   No external libraries and no network: the cleaned bytes are already in the
+   page, so saving is a pure client-side Blob download. */
+
+function b64ToBytes(b64) {
+  const bin = atob(b64);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+function saveBlob(blob, filename) {
+  const blobUrl = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.style.display = "none";
+  a.href = blobUrl;
+  a.download = filename || "download";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    URL.revokeObjectURL(blobUrl);
+    a.remove();
+  }, 1500);
+}
+
+/* Minimal store-only (uncompressed) ZIP writer. Keeps the "no CDN" promise
+   that the desktop build relies on, and the payloads are already-compressed
+   image data anyway, so deflating them would buy almost nothing. */
+const CRC_TABLE = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+
+function crc32(bytes) {
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < bytes.length; i++) {
+    c = CRC_TABLE[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+  }
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+
+function buildZip(entries) {
+  const enc = new TextEncoder();
+  const chunks = [];
+  const central = [];
+  let offset = 0;
+
+  const u16 = (v) => [v & 0xFF, (v >>> 8) & 0xFF];
+  const u32 = (v) => [v & 0xFF, (v >>> 8) & 0xFF, (v >>> 16) & 0xFF, (v >>> 24) & 0xFF];
+
+  for (const ent of entries) {
+    const nameBytes = enc.encode(ent.name);
+    const data = ent.bytes;
+    const crc = crc32(data);
+    // 0x0800 = names are UTF-8. Time/date left at 0 (valid, shows as 1980).
+    const common = [...u16(20), ...u16(0x0800), ...u16(0), ...u16(0), ...u16(0),
+                    ...u32(crc), ...u32(data.length), ...u32(data.length),
+                    ...u16(nameBytes.length)];
+
+    chunks.push(new Uint8Array([...u32(0x04034B50), ...common, ...u16(0)]));
+    chunks.push(nameBytes);
+    chunks.push(data);
+
+    central.push(new Uint8Array([
+      ...u32(0x02014B50), ...u16(20), ...common,
+      // extra len, comment len, disk start, internal attrs, external attrs,
+      // then the local header's offset.
+      ...u16(0), ...u16(0), ...u16(0), ...u16(0), ...u32(0), ...u32(offset),
+    ]));
+    central.push(nameBytes);
+
+    offset += 30 + nameBytes.length + data.length;
+  }
+
+  const centralBytes = central.reduce((n, c) => n + c.length, 0);
+  const end = new Uint8Array([
+    ...u32(0x06054B50), ...u16(0), ...u16(0),
+    ...u16(entries.length), ...u16(entries.length),
+    ...u32(centralBytes), ...u32(offset), ...u16(0),
+  ]);
+
+  return new Blob([...chunks, ...central, end], { type: "application/zip" });
+}
+
 async function browserDownloadFile(url, filename) {
   try {
     toast("Preparing " + (filename || "file") + "…");
@@ -334,18 +438,30 @@ async function browserDownloadFile(url, filename) {
 async function handleSaveOne(rid, defaultName) {
   if (isDesktop()) {
     await nativeSaveOne(rid, defaultName);
-  } else {
-    await browserDownloadFile(`/api/file/${rid}`, defaultName);
+    return;
   }
+  const p = state.payloads[rid];
+  if (p) {
+    saveBlob(new Blob([p.bytes], { type: p.mime }), defaultName || p.name);
+    toast("Saved: " + (defaultName || p.name));
+    return;
+  }
+  await browserDownloadFile(`/api/file/${rid}`, defaultName);
 }
 
 async function handleSaveReport(rid, originalName) {
   const repName = (originalName || "image").replace(/\.[^.]+$/, "") + "-report.txt";
   if (isDesktop()) {
     await nativeSaveReport(rid, repName);
-  } else {
-    await browserDownloadFile(`/api/report/${rid}`, repName);
+    return;
   }
+  const p = state.payloads[rid];
+  if (p) {
+    saveBlob(new Blob([p.report], { type: "text/plain;charset=utf-8" }), repName);
+    toast("Saved report: " + repName);
+    return;
+  }
+  await browserDownloadFile(`/api/report/${rid}`, repName);
 }
 
 async function handleSaveAll() {
@@ -395,6 +511,26 @@ async function nativeSaveAll() {
 /* -------------------------------------------------------------- browser */
 function downloadZip() {
   if (!state.lastIds.length) return;
+
+  // Serverless: the bytes are already here, so build the ZIP in the browser.
+  const inline = state.lastIds.filter((id) => state.payloads[id]);
+  if (inline.length === state.lastIds.length) {
+    const entries = [];
+    for (const id of inline) {
+      const p = state.payloads[id];
+      entries.push({ name: p.name, bytes: p.bytes });
+      if (p.report) {
+        entries.push({
+          name: p.name.replace(/\.[^.]+$/, "") + "-report.txt",
+          bytes: new TextEncoder().encode(p.report),
+        });
+      }
+    }
+    saveBlob(buildZip(entries), "cleaned-images.zip");
+    toast("Saved: cleaned-images.zip");
+    return;
+  }
+
   window.location.href = "/api/zip?ids=" + state.lastIds.join(",");
 }
 

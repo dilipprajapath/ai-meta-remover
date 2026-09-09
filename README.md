@@ -39,7 +39,8 @@ Extra per-run options (checkboxes): remove **GPS location**, remove
 
 ### Option A — run from source (developers)
 ```bash
-pip install -r requirements.txt
+pip install -r requirements.txt        # engine + web UI (browser mode)
+pip install -r requirements-build.txt  # + native window and .exe build deps
 python main.py                 # auto: native window if possible, else browser
 python main.py --ui window     # force the native desktop window
 python main.py --ui browser    # open in the default browser tab
@@ -180,11 +181,51 @@ python -m app.scrubber.cli photo.jpg --mode ai --location --report --out ./clean
 - Extremely large files (> ~300 MB) are refused by default (configurable via
   the `AI_MAX_MB` environment variable).
 
+## ☁️ Deploying to Vercel
+
+The same Flask app runs as a Vercel serverless function. `api/index.py` wraps
+`create_app()` and `vercel.json` routes every path to it.
+
+```bash
+npm i -g vercel
+vercel          # preview deployment
+vercel --prod   # production
+```
+
+Or import the GitHub repo at vercel.com — no settings to change; the defaults
+plus `vercel.json` are enough. Vercel installs **`requirements.txt` only**, so
+PyInstaller and pywebview (in `requirements-build.txt`) are never pulled into
+the function.
+
+**Serverless mode.** Vercel sets `VERCEL=1`, which flips `app/server.py` into
+stateless behaviour: `/api/process` returns each cleaned file **inline as
+base64** instead of parking it in a module-level dict. This matters because
+each request can hit a different, cold instance — a follow-up
+`GET /api/file/<id>` would otherwise 404. The browser then saves files and
+builds the ZIP locally (no CDN, no library). Set `AI_SERVERLESS=1` to exercise
+this path locally.
+
+**Know before you deploy:**
+
+| | Desktop app | Vercel |
+| --- | --- | --- |
+| Images leave your machine | Never | **Yes — uploaded to the function** |
+| Max upload | ~300 MB (`AI_MAX_MB`) | **4.5 MB per request** (platform limit) |
+| Server-side retention | In RAM, ~30 min TTL | None — nothing is stored |
+
+The "100 % offline" guarantee is a property of the *desktop* build. A hosted
+deployment necessarily receives the image; it processes it in memory and keeps
+nothing, but that is a weaker promise. Keep the installer as the private
+option and treat the web deployment as the convenient one.
+
 ## 📁 Project layout
 ```
 main.py                     entry point (native window / browser / headless)
 AI-Metadata-Remover.spec    PyInstaller spec (icon, version, pywebview data)
-requirements.txt            pinned build deps
+requirements.txt            runtime deps (engine + web UI; what Vercel installs)
+requirements-build.txt      desktop + PyInstaller build deps
+vercel.json                 Vercel routing + function config
+api/index.py                Vercel serverless entry point (wraps the Flask app)
 app/
   desktop.py                native WebView2 window + native Save dialogs
   server.py                 Flask web app (localhost, in-memory)

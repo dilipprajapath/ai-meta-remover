@@ -57,7 +57,7 @@ if %PYVER% GEQ 44 (
              Flask==3.0.3 "pyinstaller>=6.15,<7" "pyinstaller-hooks-contrib>=2024.8" || goto :err
 ) else (
   echo Installing pinned dependencies (this downloads Pillow, PyInstaller...)
-  pip install -r requirements.txt || goto :err
+  pip install -r requirements-build.txt || goto :err
 )
 
 REM ---- optional: native desktop window dependency (WebView2) -----------------

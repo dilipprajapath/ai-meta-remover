@@ -15,6 +15,7 @@ Design goals honoured here:
 
 from __future__ import annotations
 
+import base64
 import io
 import os
 import re
@@ -61,6 +62,22 @@ STORE: Dict[str, dict] = {}
 STORE_LOCK = threading.Lock()
 APP_STARTED = time.time()
 APP_TTL_SECONDS = float(os.environ.get("AI_STORE_TTL", str(30 * 60)))
+
+# ---------------------------------------------------------------------------
+# Serverless (Vercel) mode.
+#
+# On a serverless platform every request may be handled by a DIFFERENT, cold
+# process, so the module-level STORE above cannot be relied on: a later
+# GET /api/file/<rid> would land on an instance that never saw the upload and
+# would 404. In this mode /api/process therefore returns each cleaned file
+# INLINE (base64) in its JSON response and the frontend keeps the bytes in the
+# browser — no server-side state, no follow-up round trip.
+#
+# Vercel always sets VERCEL=1 in the function environment; AI_SERVERLESS=1 is
+# the manual override used for local testing of this exact code path.
+# ---------------------------------------------------------------------------
+SERVERLESS = bool(os.environ.get("VERCEL") or
+                  os.environ.get("AI_SERVERLESS"))
 
 # Set to True by the native desktop host (app/desktop.py) — lets the frontend
 # know it can use the window.pywebview bridge instead of browser downloads.
@@ -122,8 +139,9 @@ def create_app() -> Flask:
             "ok": True, "version": __version__,
             "uptime_s": int(time.time() - APP_STARTED),
             "processed_in_memory": True,
-            "offline": True,
-            "host": "127.0.0.1",
+            "offline": not SERVERLESS,
+            "serverless": SERVERLESS,
+            "host": "127.0.0.1" if not SERVERLESS else "serverless",
             "desktop_bridge": _desktop_bridge_available(),
         })
 
@@ -175,14 +193,23 @@ def create_app() -> Flask:
 
             payload = fr.output_data or raw
             content_type = _guess_mime(original_name)
-            store_put(payload, content_type,
-                      fr.output_name or original_name, rid,
-                      report_text=_build_report(fr))
+            report_text = _build_report(fr)
+            out_name = fr.output_name or original_name
 
             d = fr.to_dict()
             d["id"] = rid
-            d["download_url"] = f"/api/file/{rid}"
-            d["report_url"] = f"/api/report/{rid}"
+            if SERVERLESS:
+                # Stateless: hand the cleaned bytes straight back to the
+                # browser. Nothing is retained between requests.
+                d["data"] = base64.b64encode(payload).decode("ascii")
+                d["mime"] = content_type
+                d["save_name"] = out_name
+                d["report_text"] = report_text
+            else:
+                store_put(payload, content_type, out_name, rid,
+                          report_text=report_text)
+                d["download_url"] = f"/api/file/{rid}"
+                d["report_url"] = f"/api/report/{rid}"
             results.append(d)
 
         return jsonify({"results": results, "mode": mode,
@@ -230,7 +257,14 @@ def create_app() -> Flask:
 
     @app.get("/api/quit")
     def quit_server():
-        """Graceful shutdown used by the UI's 'Stop' button."""
+        """Graceful shutdown used by the UI's 'Stop' button.
+
+        Meaningless (and harmful) on a shared serverless host, where the
+        process is not "yours" to stop — so it is disabled there.
+        """
+        if SERVERLESS:
+            abort(404)
+
         def _bye():
             time.sleep(0.2)
             func = request.environ.get("werkzeug.server.shutdown")

@@ -1,0 +1,30 @@
+# ---------------------------------------------------------------------------
+# AI Metadata Remover — DESKTOP + BUILD dependencies.
+#
+# Everything needed to run the native window from source and to produce the
+# single-file Windows .exe. Not installed by the hosted deployment.
+#
+# NOTE FOR BUILDING THE .EXE:
+#   You do NOT install these yourself. The build script (build.bat /
+#   build_installer.bat) creates a temporary virtual environment, installs
+#   exactly the versions below, and calls PyInstaller. This keeps the final
+#   single-file .exe free of any leftover runtime dependencies.
+# ---------------------------------------------------------------------------
+
+-r requirements.txt
+
+# Native desktop window (Edge WebView2 via pywebview).
+pywebview>=5.3,<7; sys_platform == "win32"
+
+# PyInstaller — used ONLY at build time inside the temporary venv, never at
+# runtime. Pinned per Python version (your machine runs 3.14, which needs
+# PyInstaller 6.15+ — 6.10.0 only supports Python < 3.14):
+#   * Python 3.9 - 3.13 -> 6.10.0
+#   * Python 3.14+     -> latest 6.15+ release
+pyinstaller==6.10.0; python_version < "3.14"
+pyinstaller>=6.15,<7; python_version >= "3.14"
+
+# pyinstaller-hooks-contrib — pulls in Flask's hidden data files so the
+# packaged one-file exe finds its templates/static folders. Requires-python
+# is >=3.8 with no upper bound, so a single pin covers every version above.
+pyinstaller-hooks-contrib>=2024.8

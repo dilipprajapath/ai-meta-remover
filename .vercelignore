@@ -1,0 +1,17 @@
+# Windows desktop build output and tooling — none of this belongs in the
+# serverless bundle (and dist/ alone is ~75 MB).
+dist/
+build/
+scripts/
+assets/
+tests/
+.github/
+*.spec
+version_info.txt
+requirements-build.txt
+
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
