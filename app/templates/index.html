@@ -35,7 +35,7 @@
   <main>
     <!-- upload -->
     <section class="card" id="uploadCard">
-      <h2>1 · Upload images</h2>
+      <h2><span class="step">1</span> Upload images</h2>
       <p class="hint">Any number of files, any format: JPEG, PNG, BMP, TIFF, GIF, WebP, RAW
         (CR2/NEF/ARW/DNG…), SVG, HEIC, AVIF. Originals are never modified.</p>
       <div class="dropzone" id="dropzone" tabindex="0" role="button"
@@ -58,7 +58,7 @@
 
     <!-- mode -->
     <section class="card" id="modeCard">
-      <h2>2 · Choose removal mode</h2>
+      <h2><span class="step">2</span> Choose removal mode</h2>
       <div class="modes" id="modes">
         <button type="button" class="mode active" data-mode="ai" aria-pressed="true">
           <span class="mode-emoji">🎯</span>
@@ -124,7 +124,7 @@
     <p class="desktopline hidden" id="desktopLine">🪟 Running as a desktop application</p>
   </footer>
 </div>
-<div id="toast" class="hidden" role="status"></div>
+<div id="toast" role="status" aria-live="polite"></div>
 <script src="/static/app.js"></script>
 </body>
 </html>

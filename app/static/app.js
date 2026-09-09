@@ -68,9 +68,11 @@ let _toastTimer = null;
 function toast(msg, kind) {
   const el = $("toast");
   el.textContent = msg;
-  el.className = kind || "ok";      // 'ok' or 'err' (class toggles hidden off)
+  // Kept in the layer and faded via .show — display:none would cancel the
+  // transition. 'ok' / 'err' only tint the border.
+  el.className = (kind || "ok") + " show";
   clearTimeout(_toastTimer);
-  _toastTimer = setTimeout(() => el.classList.add("hidden"), 5200);
+  _toastTimer = setTimeout(() => el.classList.remove("show"), 5200);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
