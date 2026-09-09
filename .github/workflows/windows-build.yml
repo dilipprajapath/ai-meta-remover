@@ -63,7 +63,11 @@ jobs:
 
       - name: Verify native-window dependency (Python 3.12 only)
         if: matrix.python-version == '3.12'
-        run: python -c "import webview; print('pywebview', webview.__version__)"
+        # pywebview 6 dropped the module-level __version__ attribute, so read
+        # the version from installed package metadata instead.
+        run: >-
+          python -c "import webview, importlib.metadata as m;
+          print('pywebview', m.version('pywebview'))"
 
       - name: Install Inno Setup and build installer
         shell: pwsh
