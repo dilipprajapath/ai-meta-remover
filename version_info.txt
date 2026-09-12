@@ -1,13 +1,13 @@
 # UTF-8
 #
-# Windows version resource embedded into AI-Metadata-Remover.exe by
-# PyInstaller (referenced from AI-Metadata-Remover.spec as version=...).
+# Windows version resource embedded into Metavoid.exe by
+# PyInstaller (referenced from Metavoid.spec as version=...).
 # Shows up in File Explorer -> Properties -> Details and in Task Manager.
 
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(1, 0, 0, 0),
-    prodvers=(1, 0, 0, 0),
+    filevers=(1, 1, 0, 0),
+    prodvers=(1, 1, 0, 0),
     mask=0x3f,
     flags=0x0,
     OS=0x40004,
@@ -21,14 +21,14 @@ VSVersionInfo(
         StringTable(
           '040904B0',
           [
-            StringStruct('CompanyName', 'AI Metadata Remover'),
+            StringStruct('CompanyName', 'Metavoid'),
             StringStruct('FileDescription', 'Strip AI / C2PA metadata from images'),
-            StringStruct('FileVersion', '1.0.0'),
-            StringStruct('InternalName', 'AI-Metadata-Remover'),
+            StringStruct('FileVersion', '1.1.0'),
+            StringStruct('InternalName', 'Metavoid'),
             StringStruct('LegalCopyright', 'Copyright (c) 2025'),
-            StringStruct('OriginalFilename', 'AI-Metadata-Remover.exe'),
-            StringStruct('ProductName', 'AI Metadata Remover'),
-            StringStruct('ProductVersion', '1.0.0')
+            StringStruct('OriginalFilename', 'Metavoid.exe'),
+            StringStruct('ProductName', 'Metavoid'),
+            StringStruct('ProductVersion', '1.1.0')
           ]
         )
       ]

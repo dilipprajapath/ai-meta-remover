@@ -316,7 +316,7 @@ def _safe_name(name: str) -> str:
 def _build_report(fr) -> str:
     """Plain-text per-file report (same contract as the CLI report)."""
     lines = [
-        "AI Metadata Remover — per-file report",
+        "Metavoid — per-file report",
         "=" * 46,
         f"File   : {fr.original_name}",
         f"Type   : {fr.extension}",

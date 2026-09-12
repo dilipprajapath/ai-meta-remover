@@ -2,10 +2,10 @@
 # ---------------------------------------------------------------------------
 # PyInstaller spec — builds the single-file, console-less Windows .exe.
 #
-# Build it with:   python -m PyInstaller --noconfirm --clean AI-Metadata-Remover.spec
+# Build it with:   python -m PyInstaller --noconfirm --clean Metavoid.spec
 # (build.bat does exactly this inside a throwaway virtual environment.)
 #
-# Result:          dist/AI-Metadata-Remover.exe  (double-clickable, ~50-70 MB)
+# Result:          dist/Metavoid.exe  (double-clickable, ~50-70 MB)
 #
 # The exe embeds:
 #   * the app icon          -> assets/icon.ico   (shown in Explorer/taskbar)
@@ -81,7 +81,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name="AI-Metadata-Remover",
+    name="Metavoid",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

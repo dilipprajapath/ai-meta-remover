@@ -1,4 +1,4 @@
-/* AI Metadata Remover — front-end logic (plain JS, no external libraries) */
+/* Metavoid — front-end logic (plain JS, no external libraries) */
 "use strict";
 
 /* Desktop (pywebview/WebView2) mode exposes window.pywebview.api and gives us

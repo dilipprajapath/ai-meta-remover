@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-main.py — Entry point for "AI Metadata Remover".
+main.py — Entry point for "Metavoid".
 
 UI modes (pick with --ui, default is 'auto'):
 
@@ -14,7 +14,7 @@ UI modes (pick with --ui, default is 'auto'):
 
 Running:
   * from source:   python main.py [--ui window|browser] [--port N]
-  * as .exe:       double-click AI-Metadata-Remover.exe  (tries native window)
+  * as .exe:       double-click Metavoid.exe  (tries native window)
   * headless test: python main.py --no-browser --port 8799
 """
 
@@ -40,11 +40,11 @@ def _free_port() -> int:
 
 
 def _setup_logging() -> logging.Logger:
-    log = logging.getLogger("aimr")
+    log = logging.getLogger("metavoid")
     log.setLevel(logging.INFO)
     try:
         logdir = Path(os.environ.get("TEMP") or "/tmp")
-        handler = RotatingFileHandler(logdir / "ai-metadata-remover.log",
+        handler = RotatingFileHandler(logdir / "metavoid.log",
                                       maxBytes=1_000_000, backupCount=2)
         handler.setFormatter(logging.Formatter(
             "%(asctime)s %(levelname)s %(message)s"))
@@ -90,7 +90,7 @@ def _run_window_mode(app, host: str, port: int, url: str, icon: str,
 
     server = make_server(host, port, app, threaded=True)
     thread = threading.Thread(target=server.serve_forever,
-                              daemon=True, name="aimr-http")
+                              daemon=True, name="metavoid-http")
     thread.start()
     log.info("window mode at %s", url)
 
@@ -110,7 +110,7 @@ def _run_window_mode(app, host: str, port: int, url: str, icon: str,
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(description="AI Metadata Remover")
+    ap = argparse.ArgumentParser(description="Metavoid")
     ap.add_argument("--ui", choices=("auto", "window", "browser"),
                     default="auto",
                     help="window = native desktop window (WebView2); "
@@ -125,7 +125,7 @@ def main(argv=None) -> int:
     args = ap.parse_args(argv)
 
     log = _setup_logging()
-    log.info("starting AI Metadata Remover (ui=%s)", args.ui)
+    log.info("starting Metavoid (ui=%s)", args.ui)
 
     port = args.port or int(os.environ.get("AI_PORT", "0"))
     if port == 0:
@@ -137,7 +137,7 @@ def main(argv=None) -> int:
     url = f"http://{args.host}:{port}/"
     banner = (
         "\n" + "=" * 62 + "\n"
-        "  AI Metadata Remover\n"
+        "  Metavoid\n"
         f"  Local address: {url}\n"
         "  Everything runs on this computer — nothing is uploaded anywhere.\n"
         "  Close the window (or click 'Stop' in the app) to quit.\n"

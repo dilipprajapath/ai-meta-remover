@@ -1,4 +1,4 @@
-# 🧹 AI Metadata Remover
+# 🧹 Metavoid
 
 **Strip AI / C2PA signatures from images — privately, offline, with zero quality loss.**
 
@@ -48,10 +48,10 @@ python main.py --no-browser    # headless (for tests/CI)
 ```
 
 ### Option B — the installed application (recommended)
-Install the Windows **installer** (`AI-Metadata-Remover-Setup-*.exe`, built as
+Install the Windows **installer** (`Metavoid-Setup-*.exe`, built as
 described below). It installs a real application:
 
-- Start Menu folder **AI Metadata Remover** (+ optional desktop icon),
+- Start Menu folder **Metavoid** (+ optional desktop icon),
 - Add/Remove Programs entry and a full **uninstaller**,
 - launching it opens a **native desktop window** (Edge WebView2) — an
   application window with its own icon and title bar. Upload images → choose
@@ -72,8 +72,8 @@ it always starts. No runtime dependencies, 100% offline.
 
 **Easiest way to get both the app and the installer: the GitHub Actions
 build** (see "Building in CI" below) — download the **`windows-x64-py3.12`**
-artifact: it contains `AI-Metadata-Remover.exe` **and**
-`AI-Metadata-Remover-Setup-1.0.0.exe`, and the 3.12 build bundles the native
+artifact: it contains `Metavoid.exe` **and**
+`Metavoid-Setup-1.1.0.exe`, and the 3.12 build bundles the native
 desktop window.
 
 To build on your own PC (Python **3.9 – 3.13** recommended — 3.14 works for
@@ -83,18 +83,18 @@ everything except the native window; see note):
    (or run it from cmd).
 2. When it finishes you get:
    ```
-   dist\AI-Metadata-Remover.exe
+   dist\Metavoid.exe
    ```
    — a single, self-contained, double-clickable Windows x64 executable
    (~50–70 MB, console-less windowed app with icon + version info).
 3. To produce the **installer**, install
    [Inno Setup 6](https://jrsoftware.org/isdl.php) and double-click
-   `scripts\build_installer.bat` → `dist\installer\AI-Metadata-Remover-Setup-1.0.0.exe`.
+   `scripts\build_installer.bat` → `dist\installer\Metavoid-Setup-1.1.0.exe`.
 
 What `build.bat` does internally: creates a throwaway venv under `%TEMP%`,
 installs the dependencies (incl. pywebview for the native window when
 possible), then runs
-`python -m PyInstaller AI-Metadata-Remover.spec` (one-file, windowed). Your
+`python -m PyInstaller Metavoid.spec` (one-file, windowed). Your
 system Python stays untouched.
 
 > **Python 3.14?** The build script detects your Python version and installs
@@ -221,7 +221,7 @@ option and treat the web deployment as the convenient one.
 ## 📁 Project layout
 ```
 main.py                     entry point (native window / browser / headless)
-AI-Metadata-Remover.spec    PyInstaller spec (icon, version, pywebview data)
+Metavoid.spec    PyInstaller spec (icon, version, pywebview data)
 requirements.txt            runtime deps (engine + web UI; what Vercel installs)
 requirements-build.txt      desktop + PyInstaller build deps
 vercel.json                 Vercel routing + function config
@@ -239,7 +239,7 @@ assets/
 scripts/
   build.bat                 one-click single-file exe build
   build_installer.bat       one-click Inno Setup installer build
-  AI-Metadata-Remover.iss   Inno Setup script
+  Metavoid.iss   Inno Setup script
 version_info.txt            Windows version resource for the exe
 .github/workflows/          windows-latest CI build (exe + installer)
 ```

@@ -6,14 +6,14 @@ REM  Requires:  Inno Setup 6 (https://jrsoftware.org/isdl.php) installed so
 REM             that ISCC.exe is reachable, OR available via chocolatey:
 REM                 choco install innosetup
 REM
-REM  Output:    dist\installer\AI-Metadata-Remover-Setup.exe
+REM  Output:    dist\installer\Metavoid-Setup.exe
 REM ===========================================================================
-setlocal
+setlocal enabledelayedexpansion
 cd /d "%~dp0.."
 set "ROOT=%CD%"
 
 REM ---- 1. make sure the standalone exe exists -------------------------------
-if not exist "%ROOT%\dist\AI-Metadata-Remover.exe" (
+if not exist "%ROOT%\dist\Metavoid.exe" (
   echo The single-file exe was not found - running build.bat first...
   set "NO_PAUSE=1"
   call "%~dp0build.bat" || exit /b 1
@@ -40,17 +40,26 @@ if not defined ISCC (
 
 REM ---- 3. compile ------------------------------------------------------------
 echo Compiling installer...
-"%ISCC%" "%ROOT%\scripts\AI-Metadata-Remover.iss" || goto :err
+"%ISCC%" "%ROOT%\scripts\Metavoid.iss" || goto :err
 
-if exist "%ROOT%\dist\installer\AI-Metadata-Remover-Setup-1.0.0.exe" (
-  copy /y "%ROOT%\dist\installer\AI-Metadata-Remover-Setup-1.0.0.exe" "%ROOT%\dist\installer\AI-Metadata-Remover-Setup.exe" >nul
+REM Copy the newest versioned installer to the unversioned "latest" name.
+REM Resolved by pattern, not hardcoded: the version lives in Metavoid.iss and
+REM this script must not need editing every time it is bumped.
+set "LATEST="
+for /f "delims=" %%F in ('dir /b /o-d "%ROOT%\dist\installer\Metavoid-Setup-*.exe" 2^>nul') do (
+  if not defined LATEST set "LATEST=%%F"
 )
+if not defined LATEST (
+  echo [ERROR] ISCC reported success but no Metavoid-Setup-*.exe was produced.
+  goto :err
+)
+copy /y "%ROOT%\dist\installer\%LATEST%" "%ROOT%\dist\installer\Metavoid-Setup.exe" >nul
 
 echo.
 echo ============================================================
 echo  DONE. Installer created:
-echo     %ROOT%\dist\installer\AI-Metadata-Remover-Setup-1.0.0.exe
-echo     %ROOT%\dist\installer\AI-Metadata-Remover-Setup.exe
+echo     %ROOT%\dist\installer\%LATEST%
+echo     %ROOT%\dist\installer\Metavoid-Setup.exe
 echo  Share this file - users double-click to install.
 echo ============================================================
 exit /b 0

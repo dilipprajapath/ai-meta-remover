@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# AI Metadata Remover — RUNTIME dependencies (web app + engine).
+# Metavoid — RUNTIME dependencies (web app + engine).
 #
 # This is the file the hosted deployment (Vercel) installs, so it must stay
 # limited to what actually runs on a server. Desktop-only and build-only

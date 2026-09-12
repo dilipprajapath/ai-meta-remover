@@ -31,7 +31,7 @@ import threading
 from pathlib import Path
 from typing import Dict, Optional, Tuple
 
-log = logging.getLogger("aimr.desktop")
+log = logging.getLogger("metavoid.desktop")
 
 
 def native_available() -> bool:
@@ -199,7 +199,7 @@ class DesktopApi:
             pass
 
 
-def launch(url: str, title: str = "AI Metadata Remover",
+def launch(url: str, title: str = "Metavoid",
            icon: Optional[str] = None,
            on_closed=None) -> Tuple[bool, str]:
     """Open a native WebView2 window pointed at ``url``. Blocks until the

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Metadata Remover — Strip AI Signatures from Images</title>
+<title>Metavoid — Strip AI Signatures from Images</title>
 <link rel="icon" type="image/png" href="/static/icon.png">
 <link rel="shortcut icon" href="/static/icon.ico">
 <link rel="stylesheet" href="/static/style.css">
@@ -13,9 +13,9 @@
 
   <header class="top">
     <div class="brand">
-      <img src="/static/icon.png" class="brand-logo" alt="AI Metadata Remover Logo" width="44" height="44">
+      <img src="/static/icon.png" class="brand-logo" alt="Metavoid Logo" width="44" height="44">
       <div>
-        <h1>AI Metadata Remover</h1>
+        <h1>Metavoid</h1>
         {% if serverless %}
         <p class="tagline">Strip AI / C2PA signatures from images — with zero quality loss.</p>
         {% else %}
@@ -115,9 +115,9 @@
     {% if serverless %}
     {# No "Stop / exit" here: /api/quit is disabled on a shared host, and the
        process is not the visitor's to stop. #}
-    <p>AI Metadata Remover · images are cleaned in memory and never stored</p>
+    <p>Metavoid · images are cleaned in memory and never stored</p>
     {% else %}
-    <p>AI Metadata Remover · runs entirely on this computer ·
+    <p>Metavoid · runs entirely on this computer ·
        <button class="linklike" id="stopBtn" title="Stop the app">Stop / exit</button>
     </p>
     {% endif %}

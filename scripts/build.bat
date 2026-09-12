@@ -9,7 +9,7 @@ REM              Python version. Everything else is downloaded into a
 REM              throwaway virtual environment — nothing pollutes your
 REM              system Python.
 REM
-REM  Output:     dist\AI-Metadata-Remover.exe   (single, double-clickable)
+REM  Output:     dist\Metavoid.exe   (single, double-clickable)
 REM ===========================================================================
 setlocal
 cd /d "%~dp0.."
@@ -41,7 +41,7 @@ set /a PYVER=%PYA%*10+%PYB% 2>nul || set "PYVER=0"
 echo Detected Python %PYDOT%
 
 REM ---- throwaway venv (kept outside the project, under %TEMP%) --------------
-set "VENV=%TEMP%\aimr_build_venv"
+set "VENV=%TEMP%\metavoid_build_venv"
 if not exist "%VENV%" (
   echo Creating build virtual environment...
   %PY% -m venv "%VENV%" || goto :err
@@ -73,12 +73,12 @@ if errorlevel 1 (
 
 REM ---- run PyInstaller --------------------------------------------------------
 echo Building single-file executable (this can take a minute or two)...
-python -m PyInstaller --noconfirm --clean "AI-Metadata-Remover.spec" || goto :err
+python -m PyInstaller --noconfirm --clean "Metavoid.spec" || goto :err
 
 echo.
 echo ============================================================
 echo  DONE. Your app is ready:
-echo     %ROOT%\dist\AI-Metadata-Remover.exe
+echo     %ROOT%\dist\Metavoid.exe
 if "%NATIVE_OK%"=="0" (
   echo  Note: native window not bundled on this Python - the exe will
   echo        open the UI in your browser. Install Python 3.12 and rebuild

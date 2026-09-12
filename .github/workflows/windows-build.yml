@@ -40,12 +40,12 @@ jobs:
 
       - name: Build single-file .exe with PyInstaller
         run: |
-          python -m PyInstaller --noconfirm --clean AI-Metadata-Remover.spec
+          python -m PyInstaller --noconfirm --clean Metavoid.spec
 
       - name: Smoke-test the frozen exe (headless)
         shell: pwsh
         run: |
-          $proc = Start-Process -FilePath "dist\AI-Metadata-Remover.exe" `
+          $proc = Start-Process -FilePath "dist\Metavoid.exe" `
               -ArgumentList "--no-browser","--port","8799" `
               -PassThru -WindowStyle Hidden
           try {
@@ -54,7 +54,7 @@ jobs:
             Write-Host $health.Content
             if ($health.StatusCode -ne 200) { throw "health check failed" }
             $page = Invoke-WebRequest -Uri "http://127.0.0.1:8799/" -UseBasicParsing
-            if ($page.StatusCode -ne 200 -or $page.Content -notmatch "AI Metadata Remover") {
+            if ($page.StatusCode -ne 200 -or $page.Content -notmatch "Metavoid") {
               throw "UI did not render"
             }
           } finally {
@@ -74,7 +74,7 @@ jobs:
         run: |
           choco install innosetup --no-progress -y
           $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
-          & $iscc "scripts\AI-Metadata-Remover.iss"
+          & $iscc "scripts\Metavoid.iss"
           Get-ChildItem dist -Recurse -File | Select-Object FullName, Length
 
       - name: Upload artifacts
@@ -82,6 +82,6 @@ jobs:
         with:
           name: windows-x64-py${{ matrix.python-version }}
           path: |
-            dist/AI-Metadata-Remover.exe
+            dist/Metavoid.exe
             dist/installer/*.exe
           if-no-files-found: error

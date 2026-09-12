@@ -30,7 +30,7 @@ from app.scrubber.scan import scan_file, report_markdown  # noqa: E402
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(prog="ai-metadata-remover",
+    ap = argparse.ArgumentParser(prog="metavoid",
                                  description=__doc__)
     ap.add_argument("inputs", nargs="+", help="image files to clean")
     ap.add_argument("--mode", choices=("ai", "all"), default="ai")
@@ -96,7 +96,7 @@ def main(argv=None) -> int:
 
 def _build_report(fr) -> str:
     lines = [
-        "AI Metadata Remover — per-file report",
+        "Metavoid — per-file report",
         "=" * 46,
         f"File   : {fr.original_name}",
         f"Type   : {fr.extension}",

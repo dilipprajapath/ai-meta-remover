@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# AI Metadata Remover — DESKTOP + BUILD dependencies.
+# Metavoid — DESKTOP + BUILD dependencies.
 #
 # Everything needed to run the native window from source and to produce the
 # single-file Windows .exe. Not installed by the hosted deployment.
