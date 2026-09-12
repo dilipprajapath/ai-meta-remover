@@ -70,6 +70,48 @@ SUPPORTED_EXTS = (JPEG_EXTS | PNG_EXTS | WEBP_EXTS | GIF_EXTS | BMP_EXTS |
                   TIFF_EXTS | RAW_TIFF_EXTS | RAW_OTHER_EXTS | HEIF_EXTS |
                   SVG_EXTS | {"jfif", "ico"})
 
+# Every extension in SUPPORTED_EXTS needs an entry here. Anything that falls
+# through to application/octet-stream is treated as a generic download, which
+# is what made saved files lose their extension: the browser stops trusting
+# the filename and Windows has no file type to re-apply. tests/test_engine.py
+# asserts this table stays in step with SUPPORTED_EXTS.
+MIME_TYPES = {
+    # --- common web/photo formats ---
+    "jpg": "image/jpeg", "jpeg": "image/jpeg", "jpe": "image/jpeg",
+    "jfif": "image/jpeg",
+    "png": "image/png", "apng": "image/apng",
+    "gif": "image/gif", "webp": "image/webp",
+    "bmp": "image/bmp", "dib": "image/bmp", "ico": "image/x-icon",
+    "tif": "image/tiff", "tiff": "image/tiff",
+    "svg": "image/svg+xml", "svgz": "image/svg+xml",
+
+    # --- HEIF family ---
+    "heic": "image/heic", "heif": "image/heif", "hif": "image/heif",
+    "heics": "image/heic-sequence", "heifs": "image/heif-sequence",
+    "avif": "image/avif",
+
+    # --- camera RAW. The image/x-* vendor types are what exiftool, Windows
+    #     and the major browsers use, so the extension survives a download. ---
+    "cr2": "image/x-canon-cr2", "cr3": "image/x-canon-cr3",
+    "nef": "image/x-nikon-nef", "nrw": "image/x-nikon-nrw",
+    "arw": "image/x-sony-arw", "dng": "image/x-adobe-dng",
+    "orf": "image/x-olympus-orf", "rw2": "image/x-panasonic-rw2",
+    "pef": "image/x-pentax-pef", "srw": "image/x-samsung-srw",
+    "raf": "image/x-fuji-raf", "mrw": "image/x-minolta-mrw",
+    "3fr": "image/x-hasselblad-3fr", "dcr": "image/x-kodak-dcr",
+    "kdc": "image/x-kodak-kdc", "erf": "image/x-epson-erf",
+    "mef": "image/x-mamiya-mef", "iiq": "image/x-phaseone-iiq",
+    "x3f": "image/x-sigma-x3f", "raw": "image/x-panasonic-raw",
+}
+
+
+def guess_mime(name: str) -> str:
+    """MIME type for a filename, by extension. Lives here rather than in the
+    web layer so it stays beside SUPPORTED_EXTS and the two cannot drift."""
+    ext = Path(name).suffix.lower().lstrip(".")
+    return MIME_TYPES.get(ext, "application/octet-stream")
+
+
 # Human readable format name per extension
 FORMAT_LABEL = {
     "jpg": "JPEG", "jpeg": "JPEG", "jpe": "JPEG", "jfif": "JPEG",

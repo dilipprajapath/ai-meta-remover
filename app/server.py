@@ -32,7 +32,7 @@ from flask import (Flask, jsonify, request, render_template, send_file,
 
 from app import __version__
 from app.scrubber.scrubber import (clean_image, SUPPORTED_EXTS,
-                                   FORMAT_LABEL)
+                                   FORMAT_LABEL, MIME_TYPES, guess_mime)
 from app.scrubber import MODE_LABELS, OPTION_DEFAULTS
 
 # ---------------------------------------------------------------------------
@@ -344,15 +344,8 @@ def _build_report(fr) -> str:
     return "\n".join(lines)
 
 
-_MIME = {
-    "jpg": "image/jpeg", "jpeg": "image/jpeg", "jpe": "image/jpeg",
-    "png": "image/png", "gif": "image/gif", "webp": "image/webp",
-    "bmp": "image/bmp", "tif": "image/tiff", "tiff": "image/tiff",
-    "svg": "image/svg+xml", "heic": "image/heic", "heif": "image/heif",
-    "avif": "image/avif",
-}
 
 
-def _guess_mime(name: str) -> str:
-    ext = Path(name).suffix.lower().lstrip(".")
-    return _MIME.get(ext, "application/octet-stream")
+# Re-exported from the scrubber so the web layer and the engine cannot drift.
+_MIME = MIME_TYPES
+_guess_mime = guess_mime

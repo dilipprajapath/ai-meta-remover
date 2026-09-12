@@ -292,3 +292,48 @@ class TestScan:
         raw = webp_full_metadata()
         sr = scan_bytes(raw, "a.webp", "webp")
         assert sr.ai_metadata_found or sr.binary_hits
+
+
+# --------------------------------------------------------------------------
+# Saved files must keep the uploaded file's extension
+# --------------------------------------------------------------------------
+
+class TestOutputExtension:
+    """The cleaned file is the same format as the upload, so it must keep the
+    same extension — and must be served with a real image MIME type. A generic
+    application/octet-stream is what makes browsers and Windows stop trusting
+    the filename and drop the extension."""
+
+    @pytest.mark.parametrize("name,expected", [
+        ("photo.jpg", ".jpg"),
+        ("photo.jpeg", ".jpeg"),
+        ("PHOTO.JPG", ".JPG"),          # original case preserved
+        ("holiday.JPEG", ".JPEG"),
+        ("my.photo.v2.jpg", ".jpg"),    # dots in the stem
+        ("shot.jfif", ".jfif"),
+    ])
+    def test_output_name_keeps_extension(self, name, expected):
+        from app.scrubber.scrubber import clean_image
+        fr = clean_image(jpeg_full_metadata(), filename=name, mode="ai")
+        assert fr.output_name.endswith(expected), (
+            f"{name} -> {fr.output_name} lost or changed its extension")
+        assert "-clean" in fr.output_name
+
+    def test_every_supported_extension_has_a_real_mime(self):
+        from app.scrubber.scrubber import MIME_TYPES as _MIME, SUPPORTED_EXTS
+        missing = sorted(e for e in SUPPORTED_EXTS if e not in _MIME)
+        assert not missing, (
+            "these extensions fall through to application/octet-stream, which "
+            f"costs the saved file its extension: {missing}")
+
+    def test_mime_table_has_no_stale_entries(self):
+        from app.scrubber.scrubber import MIME_TYPES as _MIME, SUPPORTED_EXTS
+        extra = sorted(e for e in _MIME if e not in SUPPORTED_EXTS)
+        assert not extra, f"_MIME lists unsupported extensions: {extra}"
+
+    @pytest.mark.parametrize("name", ["a.cr2", "b.nef", "c.dng", "d.heic",
+                                      "e.ico", "f.svgz", "g.apng"])
+    def test_no_octet_stream_for_supported_formats(self, name):
+        from app.scrubber.scrubber import guess_mime as _guess_mime
+        assert _guess_mime(name) != "application/octet-stream"
+        assert _guess_mime(name).startswith("image/")

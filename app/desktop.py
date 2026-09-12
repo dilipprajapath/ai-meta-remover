@@ -88,17 +88,33 @@ class DesktopApi:
                                           "memory (session too old)."}
         if self._window is None:
             return {"ok": False, "error": "Desktop window not attached."}
+        # Offer the file's OWN type first. With a bare "(*.*)" filter Windows
+        # has no extension to fall back on, so a user who edits the name in
+        # the dialog ends up with an extension-less file; naming the real type
+        # makes the dialog re-apply it automatically.
+        ext = Path(item["name"]).suffix
+        if ext:
+            label = ext.lstrip(".").upper()
+            file_types = (f"{label} image (*{ext})", "All files (*.*)")
+        else:
+            file_types = ("All files (*.*)",)
+
         try:
             chosen = self._window.create_file_dialog(
                 webview.SAVE_DIALOG,
                 save_filename=item["name"],
-                file_types=("Image files (*.*)",),
+                file_types=file_types,
             )
         except Exception as exc:
             return {"ok": False, "error": str(exc)}
         if not chosen:
             return {"ok": False, "cancelled": True}
         path = Path(chosen if isinstance(chosen, str) else chosen[0])
+        # Belt and braces: if the dialog still handed back a name with no
+        # extension, keep the uploaded file's one rather than writing a file
+        # Windows cannot open. A deliberate different extension is respected.
+        if ext and not path.suffix:
+            path = path.with_suffix(ext)
         try:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(item["payload"])
