@@ -9,5 +9,15 @@ __pycache__/
 # local tooling noise
 .venv/
 venv/
-.env
 .pytest_cache/
+
+# secrets — never commit these.
+# ".env" alone would not cover .env.local, which is exactly what
+# `vercel env pull` writes, so match the whole family and re-allow a
+# checked-in template.
+.env
+.env.*
+!.env.example
+
+# Vercel CLI project link (org/project ids, not meant for the repo)
+.vercel/
