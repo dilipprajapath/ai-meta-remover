@@ -95,6 +95,8 @@ function toast(msg, kind) {
 document.addEventListener("DOMContentLoaded", () => {
   checkDesktopMode();
   loadLimits();
+  initStorageBanner();
+  initLegalModal();
 
   const dz = $("dropzone"), input = $("fileInput");
   dz.addEventListener("click", () => input.click());
@@ -108,13 +110,28 @@ document.addEventListener("DOMContentLoaded", () => {
   dz.addEventListener("drop", (e) => addFiles(e.dataTransfer.files));
   input.addEventListener("change", () => addFiles(input.files));
 
+  // Restore saved mode preference from localStorage
+  try {
+    const savedMode = localStorage.getItem("metavoid_mode");
+    if (savedMode && (savedMode === "ai" || savedMode === "all")) {
+      state.mode = savedMode;
+    }
+  } catch (_) {}
+
   document.querySelectorAll(".mode").forEach((btn) => {
+    const isSaved = btn.dataset.mode === state.mode;
+    btn.classList.toggle("active", isSaved);
+    btn.setAttribute("aria-pressed", isSaved ? "true" : "false");
+    btn.setAttribute("aria-checked", isSaved ? "true" : "false");
+
     btn.addEventListener("click", () => {
       state.mode = btn.dataset.mode;
+      try { localStorage.setItem("metavoid_mode", state.mode); } catch (_) {}
       document.querySelectorAll(".mode").forEach((b) => {
         const on = b === btn;
         b.classList.toggle("active", on);
         b.setAttribute("aria-pressed", on ? "true" : "false");
+        b.setAttribute("aria-checked", on ? "true" : "false");
       });
     });
   });
@@ -122,6 +139,13 @@ document.addEventListener("DOMContentLoaded", () => {
   $("goBtn").addEventListener("click", process);
   $("zipBtn").addEventListener("click", downloadZip);
   $("saveAllBtn").addEventListener("click", nativeSaveAll);
+
+  const clearUploadsBtn = $("clearUploadsBtn");
+  if (clearUploadsBtn) clearUploadsBtn.addEventListener("click", clearSelectedFiles);
+
+  const clearDataBtn = $("clearDataBtn");
+  if (clearDataBtn) clearDataBtn.addEventListener("click", handleClearSession);
+
   // Absent in serverless mode — the template omits the Stop / exit control.
   const stopBtn = $("stopBtn");
   if (stopBtn) stopBtn.addEventListener("click", stopApp);
@@ -162,13 +186,17 @@ function removeFile(i) {
 function renderThumbs() {
   const box = $("thumbs");
   box.innerHTML = "";
+  const clrBtn = $("clearUploadsBtn");
+  if (clrBtn) clrBtn.classList.toggle("hidden", state.files.length === 0);
+
   state.files.forEach((it, i) => {
     const d = document.createElement("div");
     d.className = "thumb";
     const inner = document.createElement("div");
     if (it.url) {
       const img = document.createElement("img");
-      img.src = it.url; img.alt = "";
+      img.src = it.url;
+      img.alt = `Preview of ${it.file.name}`;
       inner.appendChild(img);
     } else {
       const ph = document.createElement("div");
@@ -179,7 +207,9 @@ function renderThumbs() {
       inner.appendChild(ph);
     }
     const x = document.createElement("button");
-    x.className = "x"; x.textContent = "×";
+    x.className = "x";
+    x.textContent = "×";
+    x.setAttribute("aria-label", `Remove ${it.file.name}`);
     x.addEventListener("click", () => removeFile(i));
     const nm = document.createElement("div");
     nm.className = "tname"; nm.textContent = it.file.name;
@@ -189,6 +219,30 @@ function renderThumbs() {
     d.appendChild(inner); d.appendChild(x); d.appendChild(nm); d.appendChild(meta);
     box.appendChild(d);
   });
+}
+
+function clearSelectedFiles() {
+  state.files.forEach((f) => { if (f.url) URL.revokeObjectURL(f.url); });
+  state.files = [];
+  const fi = $("fileInput");
+  if (fi) fi.value = "";
+  renderThumbs();
+  syncGo();
+  toast("Selected files cleared.");
+}
+
+async function handleClearSession() {
+  clearSelectedFiles();
+  state.lastIds = [];
+  state.payloads = {};
+  const resWrap = $("resultsWrap");
+  if (resWrap) resWrap.classList.add("hidden");
+  const resDiv = $("results");
+  if (resDiv) resDiv.innerHTML = "";
+  try {
+    await fetch("/api/clear", { method: "POST" });
+  } catch (_) {}
+  toast("All session files and in-memory caches have been cleared.", "ok");
 }
 
 /* ---------------------------------------------------------------- process */
@@ -595,3 +649,89 @@ async function stopApp() {
       '<div style="text-align:center"><h2>Server stopped</h2><p style="color:#9aa7b4">You can close this tab now.</p></div></div>');
   }
 }
+
+/* --------------------------------------------------- compliance & legal UI */
+function initStorageBanner() {
+  const banner = $("storageBanner");
+  if (!banner) return;
+  let acked = false;
+  try {
+    acked = localStorage.getItem("metavoid_storage_ack") === "1";
+  } catch (_) {}
+  if (!acked) {
+    banner.classList.remove("hidden");
+  }
+  const ackBtn = $("ackStorageBtn");
+  if (ackBtn) {
+    ackBtn.addEventListener("click", () => {
+      try { localStorage.setItem("metavoid_storage_ack", "1"); } catch (_) {}
+      banner.classList.add("hidden");
+    });
+  }
+}
+
+let _lastFocusedElement = null;
+
+function initLegalModal() {
+  const modal = $("legalModal");
+  if (!modal) return;
+
+  // Handle footer & banner legal links
+  document.querySelectorAll(".legal-link").forEach((link) => {
+    link.addEventListener("click", (e) => {
+      if (typeof modal.showModal === "function") {
+        e.preventDefault();
+        _lastFocusedElement = link;
+        const targetTab = link.dataset.tab || "privacy";
+        switchLegalTab(targetTab);
+        modal.showModal();
+        const activeTabBtn = $(`tab-${targetTab}`);
+        if (activeTabBtn) activeTabBtn.focus();
+      }
+    });
+  });
+
+  // Tab switching inside modal
+  modal.querySelectorAll(".tab-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      switchLegalTab(btn.dataset.target);
+    });
+  });
+
+  // Close buttons
+  const closeBtn = $("modalCloseBtn");
+  const dismissBtn = $("modalDismissBtn");
+  const closeModal = () => {
+    modal.close();
+    if (_lastFocusedElement && typeof _lastFocusedElement.focus === "function") {
+      _lastFocusedElement.focus();
+    }
+  };
+
+  if (closeBtn) closeBtn.addEventListener("click", closeModal);
+  if (dismissBtn) dismissBtn.addEventListener("click", closeModal);
+
+  // Close on backdrop click
+  modal.addEventListener("click", (e) => {
+    const rect = modal.getBoundingClientRect();
+    const isInDialog = (
+      rect.top <= e.clientY && e.clientY <= rect.top + rect.height &&
+      rect.left <= e.clientX && e.clientX <= rect.left + rect.width
+    );
+    if (!isInDialog) closeModal();
+  });
+}
+
+function switchLegalTab(tabId) {
+  const modal = $("legalModal");
+  if (!modal) return;
+  modal.querySelectorAll(".tab-btn").forEach((btn) => {
+    const active = btn.dataset.target === tabId;
+    btn.classList.toggle("active", active);
+    btn.setAttribute("aria-selected", active ? "true" : "false");
+  });
+  modal.querySelectorAll(".tab-pane").forEach((pane) => {
+    pane.classList.toggle("active", pane.id === "pane-" + tabId);
+  });
+}
+

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Legal & Privacy Information — Metavoid</title>
+<link rel="icon" type="image/png" href="/static/icon.png">
+<link rel="shortcut icon" href="/static/icon.ico">
+<link rel="stylesheet" href="/static/style.css">
+<style>
+  .legal-page { max-width: 860px; margin: 0 auto; padding: 40px 20px 80px; }
+  .legal-header { margin-bottom: 28px; }
+  .legal-header h1 { font-size: 28px; margin: 0 0 8px; }
+  .legal-nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+  .legal-nav a {
+    color: var(--muted); text-decoration: none; padding: 6px 14px;
+    border-radius: var(--radius-pill); font-size: 13.5px; border: 1px solid transparent;
+    transition: all .15s ease;
+  }
+  .legal-nav a:hover { color: var(--text); background: var(--panel2); }
+  .legal-nav a.active { color: var(--accent); background: var(--accent-soft); border-color: rgba(56, 189, 248, .3); font-weight: 600; }
+  .legal-section { display: none; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; line-height: 1.68; }
+  .legal-section.active { display: block; }
+  .legal-section h2 { margin: 0 0 16px; font-size: 20px; color: var(--text); }
+  .legal-section h3 { margin: 24px 0 10px; font-size: 16px; color: var(--accent); }
+  .legal-section p, .legal-section li { color: #d0d7de; font-size: 14.5px; }
+  .legal-section ul { padding-left: 20px; margin: 10px 0; }
+  .legal-section li { margin-bottom: 6px; }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); text-decoration: none; font-size: 14px; margin-bottom: 20px; }
+  .back-link:hover { text-decoration: underline; }
+  .audit-badge { display: inline-block; background: rgba(63, 185, 80, .1); border: 1px solid rgba(63, 185, 80, .3); color: var(--green); padding: 3px 10px; border-radius: var(--radius-pill); font-size: 12px; font-weight: 600; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+<div class="legal-page">
+  <a href="/" class="back-link">← Back to Metavoid</a>
+
+  <header class="legal-header">
+    <h1>Legal, Privacy & Compliance</h1>
+    <p class="tagline">Plain-language documentation of our data practices, terms, and open-source commitments.</p>
+  </header>
+
+  <nav class="legal-nav" aria-label="Legal documents">
+    <a href="/privacy" class="{% if active_tab == 'privacy' %}active{% endif %}" data-target="privacy">Privacy Policy</a>
+    <a href="/terms" class="{% if active_tab == 'terms' %}active{% endif %}" data-target="terms">Terms of Service</a>
+    <a href="/cookies" class="{% if active_tab == 'cookies' %}active{% endif %}" data-target="cookies">Cookie & Storage</a>
+    <a href="/refunds" class="{% if active_tab == 'refunds' %}active{% endif %}" data-target="refunds">Refund & Pricing</a>
+    <a href="/licenses" class="{% if active_tab == 'licenses' %}active{% endif %}" data-target="licenses">Licenses & Operator</a>
+  </nav>
+
+  <main>
+    <!-- 1. Privacy Policy -->
+    <article id="sec-privacy" class="legal-section {% if active_tab == 'privacy' %}active{% endif %}">
+      <span class="audit-badge">✔ 100% In-Memory Processing · Zero User Profiling</span>
+      <h2>Privacy Policy</h2>
+      <p><em>Last revised: September 2026</em></p>
+
+      <p>Metavoid is designed from the ground up as a digital hygiene tool. We believe the safest data is data we never store. This policy outlines exactly what happens when you process an image.</p>
+
+      <h3>1. Data Processing Architecture</h3>
+      <ul>
+        <li><strong>In-Memory Scrubbing:</strong> When you submit files for metadata stripping, processing takes place entirely in volatile RAM. Files are cleaned and streamed directly back to you. They are never written to permanent disk storage.</li>
+        <li><strong>Zero Training Retention:</strong> We never store your images, and we never use your images, metadata, or prompts to train, fine-tune, or evaluate any artificial intelligence or machine learning models.</li>
+        <li><strong>Local Desktop Execution:</strong> When using the standalone Windows desktop application, all processing happens strictly on your local device (<code>127.0.0.1</code>). Exactly zero bytes of file data or metadata leave your computer.</li>
+        <li><strong>Hosted Web Execution:</strong> When accessing our web deployment, uploaded files remain in memory only for the duration of the HTTP request and are pruned immediately. Temporary server access logs (IP address, request path, timestamp) are retained for a maximum of 48 hours solely for DDoS mitigation and infrastructure security before being permanently overwritten.</li>
+      </ul>
+
+      <h3>2. Information We Do NOT Collect</h3>
+      <p>We do not collect:</p>
+      <ul>
+        <li>Names, email addresses, phone numbers, or account credentials.</li>
+        <li>Payment information or credit card numbers.</li>
+        <li>Tracking cookies, browser fingerprinting profiles, or behavioral advertising data.</li>
+        <li>GPS coordinates, camera metadata, or biometric data extracted from your images.</li>
+      </ul>
+
+      <h3>3. Rights Under GDPR (EEA/UK) & CCPA/CPRA (California)</h3>
+      <p>Under international data protection regulations (including the EU/UK General Data Protection Regulation and the California Consumer Privacy Act), you have the right to access, rectify, port, and delete personal information, as well as the right to non-discrimination. Because we do not collect personal profiles or retain uploaded images, we hold no user data to sell or share. You may click the <strong>"Clear Session Data"</strong> button in the interface at any time to instantly flush all cached thumbnails and in-memory references.</p>
+
+      <h3>4. Children's Online Privacy (COPPA & GDPR-K)</h3>
+      <p>Metavoid is a general audience utility tool. We do not knowingly collect, solicit, or maintain personal information from children under the age of 13 (or under 16 in the European Union). Since no personal data or account creation exists, no children's data is retained.</p>
+
+      <h3>5. Contact for Privacy Requests</h3>
+      <p>For inquiries regarding this policy or technical verification, contact: <a href="mailto:contact@metavoid.app" class="linklike">contact@metavoid.app</a>.</p>
+    </article>
+
+    <!-- 2. Terms of Service -->
+    <article id="sec-terms" class="legal-section {% if active_tab == 'terms' %}active{% endif %}">
+      <h2>Terms of Service</h2>
+      <p><em>Last revised: September 2026</em></p>
+
+      <h3>1. Agreement to Terms</h3>
+      <p>By downloading, running, or accessing Metavoid, you agree to these Terms. If you do not agree, do not use the software.</p>
+
+      <h3>2. Intellectual Property & Your Ownership</h3>
+      <p><strong>You retain 100% full ownership, copyright, and title to all images you process.</strong> Metavoid claims zero rights, zero license, and zero copyright in your uploaded files or the resulting cleaned files. You remain solely responsible for the images you choose to modify.</p>
+
+      <h3>3. Permitted & Acceptable Use</h3>
+      <p>You agree to use Metavoid in compliance with all applicable laws. You must not use this tool to:</p>
+      <ul>
+        <li>Process child sexual abuse material (CSAM) or any unlawful exploitation media.</li>
+        <li>Distribute malicious code, exploits, or malware.</li>
+        <li>Infringe on the intellectual property or privacy rights of third parties without authorization.</li>
+      </ul>
+
+      <h3>4. Disclaimer of Warranties ("AS IS")</h3>
+      <p>Metavoid is provided "as is" and "as available", without warranty of any kind, express or implied. While our engine is engineered to perform non-destructive, pixel-identical metadata removal without re-compression, we strongly recommend keeping backup copies of your original files.</p>
+
+      <h3>5. Limitation of Liability</h3>
+      <p>To the fullest extent permitted by law, the authors, maintainers, and contributors shall not be liable for any indirect, incidental, special, or consequential damages resulting from the use or inability to use this software.</p>
+    </article>
+
+    <!-- 3. Cookie & Storage Policy -->
+    <article id="sec-cookies" class="legal-section {% if active_tab == 'cookies' %}active{% endif %}">
+      <span class="audit-badge">✔ Zero Tracking Cookies · Zero Third-Party Analytics</span>
+      <h2>Cookie & Storage Policy</h2>
+      <p><em>Last revised: September 2026</em></p>
+
+      <h3>1. No Tracking or Marketing Cookies</h3>
+      <p>Metavoid operates a <strong>cookie-free architecture</strong>. We do not set HTTP tracking cookies, marketing cookies, third-party analytics cookies, or cross-site identifiers.</p>
+
+      <h3>2. Essential Browser Local Storage</h3>
+      <p>The application only uses your browser's built-in <code>localStorage</code> API for strictly necessary interface functions:</p>
+      <ul>
+        <li><code>metavoid_mode</code>: Remembers your selected cleaning mode (e.g. "Remove Only AI Metadata" vs "Remove All Metadata").</li>
+        <li><code>metavoid_storage_ack</code>: Remembers that you have dismissed the informational storage banner so it does not interrupt you again.</li>
+      </ul>
+      <p>This information stays entirely inside your browser sandbox on your device and is never sent to our servers or any third parties.</p>
+    </article>
+
+    <!-- 4. Refund & Pricing Policy -->
+    <article id="sec-refunds" class="legal-section {% if active_tab == 'refunds' %}active{% endif %}">
+      <h2>Refund & Pricing Policy</h2>
+      <p><em>Last revised: September 2026</em></p>
+
+      <h3>1. 100% Free & Open Source</h3>
+      <p>Metavoid is entirely free of charge. There are:</p>
+      <ul>
+        <li>No subscription fees.</li>
+        <li>No paid tiers or paywalled features.</li>
+        <li>No credit card or payment information requirements.</li>
+        <li>No hidden microtransactions.</li>
+      </ul>
+
+      <h3>2. Refund Policy</h3>
+      <p>Because the software is provided completely free of charge and no financial transactions take place, refunds do not apply. If paid commercial support or managed team licenses are offered in the future, every paid transaction will include a guaranteed 14-day, no-questions-asked refund policy.</p>
+    </article>
+
+    <!-- 5. Licenses & Operator -->
+    <article id="sec-licenses" class="legal-section {% if active_tab == 'licenses' %}active{% endif %}">
+      <h2>Operator Information & Open Source Licenses</h2>
+
+      <h3>Operator Details</h3>
+      <ul>
+        <li><strong>Project:</strong> Metavoid (Open Source AI Metadata Remover)</li>
+        <li><strong>Publisher:</strong> Metavoid Community Maintainers</li>
+        <li><strong>Support & Compliance Email:</strong> <a href="mailto:contact@metavoid.app" class="linklike">contact@metavoid.app</a></li>
+        <li><strong>Hosting Provider (Cloud Deployment):</strong> Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723</li>
+      </ul>
+
+      <h3>Open Source Dependencies & Attributions</h3>
+      <p>Metavoid is built with gratitude upon battle-tested open-source software:</p>
+      <ul>
+        <li><strong>Pillow:</strong> Historical Permission Notice and Disclaimer (HPND)</li>
+        <li><strong>Flask:</strong> BSD 3-Clause License</li>
+        <li><strong>piexif:</strong> MIT License</li>
+        <li><strong>defusedxml:</strong> Python Software Foundation License</li>
+        <li><strong>pywebview:</strong> BSD 3-Clause License</li>
+      </ul>
+      <p>The Metavoid application itself is distributed under the permissive MIT License.</p>
+    </article>
+  </main>
+</div>
+
+<script>
+  // Tab switching if accessed directly via URL with tabs or hash
+  document.querySelectorAll('.legal-nav a').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const target = link.getAttribute('data-target');
+      if (target) {
+        e.preventDefault();
+        window.history.pushState(null, '', '/' + target);
+        document.querySelectorAll('.legal-nav a').forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+        document.querySelectorAll('.legal-section').forEach(sec => sec.classList.remove('active'));
+        const sec = document.getElementById('sec-' + target);
+        if (sec) sec.classList.add('active');
+      }
+    });
+  });
+</script>
+</body>
+</html>

@@ -123,6 +123,14 @@ def store_snapshot() -> Dict[str, dict]:
         return dict(STORE)
 
 
+def store_clear() -> int:
+    """Drop every in-memory result immediately (e.g. on user data deletion request)."""
+    with STORE_LOCK:
+        count = len(STORE)
+        STORE.clear()
+        return count
+
+
 def create_app() -> Flask:
     app = Flask(
         __name__,
@@ -165,6 +173,32 @@ def create_app() -> Flask:
             "options": OPTION_DEFAULTS,
             "exts": sorted(SUPPORTED_EXTS),
         })
+
+    @app.post("/api/clear")
+    def clear_session():
+        """Immediately drop all in-memory processed files (data deletion request)."""
+        count = store_clear()
+        return jsonify({"ok": True, "cleared_count": count})
+
+    @app.get("/privacy")
+    def privacy():
+        return render_template("legal.html", active_tab="privacy", serverless=SERVERLESS)
+
+    @app.get("/terms")
+    def terms():
+        return render_template("legal.html", active_tab="terms", serverless=SERVERLESS)
+
+    @app.get("/cookies")
+    def cookies():
+        return render_template("legal.html", active_tab="cookies", serverless=SERVERLESS)
+
+    @app.get("/refunds")
+    def refunds():
+        return render_template("legal.html", active_tab="refunds", serverless=SERVERLESS)
+
+    @app.get("/licenses")
+    def licenses():
+        return render_template("legal.html", active_tab="licenses", serverless=SERVERLESS)
 
     # -------------------------------------------------------------- processing
     @app.post("/api/process")

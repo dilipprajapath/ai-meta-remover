@@ -337,3 +337,41 @@ class TestOutputExtension:
         from app.scrubber.scrubber import guess_mime as _guess_mime
         assert _guess_mime(name) != "application/octet-stream"
         assert _guess_mime(name).startswith("image/")
+
+
+class TestLegalAndComplianceRoutes:
+    """Ensure compliance routes and data deletion endpoint function correctly."""
+
+    @pytest.fixture
+    def client(self):
+        from app.server import create_app
+        app = create_app()
+        app.config["TESTING"] = True
+        with app.test_client() as c:
+            yield c
+
+    def test_clear_endpoint_drops_memory_store(self, client):
+        from app.server import store_put, store_get
+        store_put(b"test-payload", "image/png", "test.png", "test-rid-123")
+        assert store_get("test-rid-123") is not None
+
+        resp = client.post("/api/clear")
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert data["ok"] is True
+        assert data["cleared_count"] >= 1
+        assert store_get("test-rid-123") is None
+
+    @pytest.mark.parametrize("route,expected_text", [
+        ("/privacy", "Privacy Policy"),
+        ("/terms", "Terms of Service"),
+        ("/cookies", "Cookie & Storage Policy"),
+        ("/refunds", "Refund & Pricing Policy"),
+        ("/licenses", "Operator Information & Open Source Licenses"),
+    ])
+    def test_legal_routes_render_html(self, client, route, expected_text):
+        resp = client.get(route)
+        assert resp.status_code == 200
+        text = resp.get_data(as_text=True)
+        assert expected_text in text
+        assert "Metavoid" in text

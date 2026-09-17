@@ -73,7 +73,7 @@ it always starts. No runtime dependencies, 100% offline.
 **Easiest way to get both the app and the installer: the GitHub Actions
 build** (see "Building in CI" below) — download the **`windows-x64-py3.12`**
 artifact: it contains `Metavoid.exe` **and**
-`Metavoid-Setup-1.1.0.exe`, and the 3.12 build bundles the native
+`Metavoid-Setup-1.2.0.exe`, and the 3.12 build bundles the native
 desktop window.
 
 To build on your own PC (Python **3.9 – 3.13** recommended — 3.14 works for
@@ -89,7 +89,7 @@ everything except the native window; see note):
    (~50–70 MB, console-less windowed app with icon + version info).
 3. To produce the **installer**, install
    [Inno Setup 6](https://jrsoftware.org/isdl.php) and double-click
-   `scripts\build_installer.bat` → `dist\installer\Metavoid-Setup-1.1.0.exe`.
+   `scripts\build_installer.bat` → `dist\installer\Metavoid-Setup-1.2.0.exe`.
 
 What `build.bat` does internally: creates a throwaway venv under `%TEMP%`,
 installs the dependencies (incl. pywebview for the native window when
