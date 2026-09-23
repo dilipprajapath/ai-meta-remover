@@ -11,8 +11,11 @@
 ; =============================================================================
 
 #define MyAppName "Metavoid"
-#define MyAppVersion "1.2.0"
-#define MyAppPublisher "Metavoid"
+#define MyAppVersion "1.2.1"
+#define MyAppPublisher "Metavoid Maintainers"
+#define MyAppURL "https://github.com/dilipprajapath/ai-meta-remover"
+#define MyAppSupportURL "mailto:contact@metavoid.app"
+#define MyAppUpdatesURL "https://github.com/dilipprajapath/ai-meta-remover/releases"
 #define MyAppExeName "Metavoid.exe"
 
 [Setup]
@@ -21,9 +24,15 @@ AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
+AppPublisherURL={#MyAppURL}
+AppSupportURL={#MyAppSupportURL}
+AppUpdatesURL={#MyAppUpdatesURL}
+AppContact=contact@metavoid.app
 VersionInfoVersion={#MyAppVersion}.0
 VersionInfoCompany={#MyAppPublisher}
 VersionInfoDescription=Strip AI / C2PA metadata from images
+VersionInfoCopyright=Copyright (c) 2025-2026 Metavoid Maintainers
+LicenseFile=..\LICENSE.txt
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 OutputDir=..\dist\installer
@@ -59,9 +68,11 @@ Type: files; Name: "{autodesktop}\AI Metadata Remover.lnk"
 [Files]
 Source: "..\dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\assets\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppExeName}"
+Name: "{group}\License & Legal Terms"; Filename: "{app}\LICENSE.txt"
 Name: "{group}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 

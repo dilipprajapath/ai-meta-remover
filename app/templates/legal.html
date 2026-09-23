@@ -10,7 +10,7 @@
 <style>
   .legal-page { max-width: 860px; margin: 0 auto; padding: 40px 20px 80px; }
   .legal-header { margin-bottom: 28px; }
-  .legal-header h1 { font-size: 28px; margin: 0 0 8px; }
+  .legal-header h1 { font-family: var(--font-display); font-size: 28px; margin: 0 0 8px; letter-spacing: -.4px; }
   .legal-nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
   .legal-nav a {
     color: var(--muted); text-decoration: none; padding: 6px 14px;
@@ -21,14 +21,14 @@
   .legal-nav a.active { color: var(--accent); background: var(--accent-soft); border-color: rgba(56, 189, 248, .3); font-weight: 600; }
   .legal-section { display: none; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; line-height: 1.68; }
   .legal-section.active { display: block; }
-  .legal-section h2 { margin: 0 0 16px; font-size: 20px; color: var(--text); }
-  .legal-section h3 { margin: 24px 0 10px; font-size: 16px; color: var(--accent); }
+  .legal-section h2 { font-family: var(--font-display); margin: 0 0 16px; font-size: 20px; color: var(--text); letter-spacing: -.2px; }
+  .legal-section h3 { font-family: var(--font-display); margin: 24px 0 10px; font-size: 16px; color: var(--accent); letter-spacing: -.1px; }
   .legal-section p, .legal-section li { color: #d0d7de; font-size: 14.5px; }
   .legal-section ul { padding-left: 20px; margin: 10px 0; }
   .legal-section li { margin-bottom: 6px; }
   .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); text-decoration: none; font-size: 14px; margin-bottom: 20px; }
   .back-link:hover { text-decoration: underline; }
-  .audit-badge { display: inline-block; background: rgba(63, 185, 80, .1); border: 1px solid rgba(63, 185, 80, .3); color: var(--green); padding: 3px 10px; border-radius: var(--radius-pill); font-size: 12px; font-weight: 600; margin-bottom: 12px; }
+  .audit-badge { display: inline-block; font-family: var(--font-mono); background: rgba(63, 185, 80, .1); border: 1px solid rgba(63, 185, 80, .3); color: var(--green); padding: 3px 10px; border-radius: var(--radius-pill); font-size: 12px; font-weight: 600; margin-bottom: 12px; letter-spacing: .2px; }
 </style>
 </head>
 <body>
