@@ -66,7 +66,6 @@
       <h2 id="modeHeading"><span class="step">2</span> Choose removal mode</h2>
       <div class="modes" id="modes" role="radiogroup" aria-label="Removal Mode">
         <button type="button" class="mode active" data-mode="ai" aria-pressed="true" role="radio" aria-checked="true">
-          <span class="mode-emoji" aria-hidden="true">🎯</span>
           <span class="mode-title">Remove Only AI Metadata</span>
           <span class="mode-badge">Recommended</span>
           <span class="mode-desc">
@@ -76,7 +75,6 @@
           </span>
         </button>
         <button type="button" class="mode" data-mode="all" aria-pressed="false" role="radio" aria-checked="false">
-          <span class="mode-emoji" aria-hidden="true">🗑️</span>
           <span class="mode-title">Remove All Metadata</span>
           <span class="mode-desc">
             Removes all metadata including EXIF, GPS, timestamps, camera
@@ -101,7 +99,7 @@
         <span id="goLabel">Remove metadata</span>
       </button>
       <p class="form-consent">By removing metadata, you confirm you have authorization to modify these files. Processing occurs strictly in volatile memory and images are never stored or used to train AI models.</p>
-      <p class="promise">✔ Original files untouched &nbsp;·&nbsp; ✔ No re-compression, pixel-identical output &nbsp;·&nbsp; ✔ Every format keeps its original type</p>
+      <p class="promise">Original files untouched &nbsp;·&nbsp; No re-compression, pixel-identical output &nbsp;·&nbsp; Every format keeps its original type</p>
     </section>
 
     <!-- results -->
@@ -109,9 +107,9 @@
       <div class="results-head">
         <h2 id="resultsHeading">Results</h2>
         <div class="head-actions">
-          <button class="ghost" id="clearDataBtn" title="Wipe all processed results and clear in-memory caches">🧹 Clear session data</button>
-          <button class="ghost hidden" id="saveAllBtn" title="Native folder picker">💾 Save all to folder…</button>
-          <button class="ghost" id="zipBtn">⬇ Download all (ZIP)</button>
+          <button class="ghost" id="clearDataBtn" title="Wipe all processed results and clear in-memory caches">Clear session data</button>
+          <button class="ghost hidden" id="saveAllBtn" title="Native folder picker">Save all to folder…</button>
+          <button class="ghost" id="zipBtn">Download all (ZIP)</button>
         </div>
       </div>
       <div id="results" aria-live="polite"></div>
@@ -119,7 +117,7 @@
   </main>
 
   <footer role="contentinfo">
-    <p class="fee-badge">100% Free &amp; Open-Source · Zero Subscriptions · Zero Hidden Fees · 0 Trackers</p>
+    <p class="fee-badge">Free and open source · no accounts · no tracking</p>
     {% if serverless %}
     <p>Metavoid · images are cleaned in memory and never stored</p>
     {% else %}
@@ -127,7 +125,7 @@
        <button class="linklike" id="stopBtn" title="Stop the app">Stop / exit</button>
     </p>
     {% endif %}
-    <p class="desktopline hidden" id="desktopLine">🪟 Running as a desktop application</p>
+    <p class="desktopline hidden" id="desktopLine">Running as a desktop application</p>
 
     <nav class="footer-nav" aria-label="Legal &amp; compliance information">
       <a href="/privacy" class="legal-link" data-tab="privacy">Privacy Policy</a> &nbsp;·&nbsp;
@@ -169,7 +167,7 @@
     <div class="modal-body">
       <!-- Privacy -->
       <section id="pane-privacy" role="tabpanel" aria-labelledby="tab-privacy" class="tab-pane active">
-        <span class="audit-chip">✔ 100% In-Memory Processing · Zero User Profiling</span>
+        <span class="audit-chip">In-memory processing · no user profiling</span>
         <h3>Privacy Policy</h3>
         <p><em>Last updated: September 2026</em></p>
         <p>Metavoid is designed as an offline-first digital hygiene tool. We believe the safest data is data that is never stored.</p>
@@ -206,7 +204,7 @@
 
       <!-- Cookies -->
       <section id="pane-cookies" role="tabpanel" aria-labelledby="tab-cookies" class="tab-pane">
-        <span class="audit-chip">✔ Zero Tracking Cookies · Zero Third-Party Analytics</span>
+        <span class="audit-chip">No tracking cookies · no third-party analytics</span>
         <h3>Cookie &amp; Local Storage Policy</h3>
         <p><em>Last updated: September 2026</em></p>
         <h4>1. Cookie-Free Architecture</h4>

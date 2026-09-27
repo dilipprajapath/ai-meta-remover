@@ -387,7 +387,7 @@ function renderResults(results) {
 
     const bSave = document.createElement("button");
     bSave.className = "small-btn dl";
-    bSave.textContent = "💾 Save cleaned file";
+    bSave.textContent = "Save cleaned file";
     bSave.title = "Save cleaned file to your computer";
     const outName = r.output_name || r.original_name;
     bSave.addEventListener("click", () => handleSaveOne(r.id, outName));
@@ -645,8 +645,8 @@ async function stopApp() {
     try { await fetch("/api/quit"); } catch (_) { /* gone already */ }
     document.body.insertAdjacentHTML(
       "beforeend",
-      '<div style="position:fixed;inset:0;background:#0d1117f2;display:flex;align-items:center;justify-content:center;z-index:99">' +
-      '<div style="text-align:center"><h2>Server stopped</h2><p style="color:#9aa7b4">You can close this tab now.</p></div></div>');
+      '<div style="position:fixed;inset:0;background:rgba(14,14,16,.95);display:flex;align-items:center;justify-content:center;z-index:99">' +
+      '<div style="text-align:center"><h2>Server stopped</h2><p style="color:var(--muted)">You can close this tab now.</p></div></div>');
   }
 }
 

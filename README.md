@@ -1,4 +1,4 @@
-# 🧹 Metavoid
+# Metavoid
 
 **Strip AI / C2PA signatures from images — privately, offline, with zero quality loss.**
 
@@ -11,7 +11,7 @@ no servers, no telemetry.**
 
 ---
 
-## ✨ What it does
+## What it does
 
 | Upload | Removed (mode: AI only) | Removed (mode: All) | Output |
 | --- | --- | --- | --- |
@@ -19,10 +19,10 @@ no servers, no telemetry.**
 
 Two removal modes (as in the UI):
 
-- **🎯 Remove Only AI Metadata (recommended)** — removes AI-provenance
+- **Remove Only AI Metadata (recommended)** — removes AI-provenance
   metadata while **preserving your camera EXIF, GPS, copyright and other
   important metadata**.
-- **🗑️ Remove All Metadata** — removes ALL metadata (EXIF, GPS, timestamps,
+- **Remove All Metadata** — removes ALL metadata (EXIF, GPS, timestamps,
   camera settings, copyright). Results in a completely clean file.
 
 Extra per-run options (checkboxes): remove **GPS location**, remove
@@ -35,7 +35,7 @@ Extra per-run options (checkboxes): remove **GPS location**, remove
 
 ---
 
-## 🖥️ Using the app
+## Using the app
 
 ### Option A — run from source (developers)
 ```bash
@@ -55,7 +55,7 @@ described below). It installs a real application:
 - Add/Remove Programs entry and a full **uninstaller**,
 - launching it opens a **native desktop window** (Edge WebView2) — an
   application window with its own icon and title bar. Upload images → choose
-  mode/options → **Remove metadata** → **💾 Save cleaned image…** / **Save all
+  mode/options → **Remove metadata** → **Save cleaned image…** / **Save all
   to folder…** opens normal Windows save dialogs.
 
 The same `.exe` can also be run standalone (double-click): it opens the native
@@ -68,7 +68,7 @@ it always starts. No runtime dependencies, 100% offline.
 
 ---
 
-## 🔨 Building the Windows .exe (one click)
+## Building the Windows .exe (one click)
 
 **Easiest way to get both the app and the installer: the GitHub Actions
 build** (see "Building in CI" below) — download the **`windows-x64-py3.12`**
@@ -118,7 +118,7 @@ uploads one artifact per Python version:
 
 ---
 
-## 🧩 How the stripping works (engine overview)
+## How the stripping works (engine overview)
 
 All logic lives in `app/scrubber/`:
 
@@ -147,7 +147,7 @@ left byte-identical.
 
 ---
 
-## 🔬 Running the tests
+## Running the tests
 
 ```bash
 pip install -r requirements.txt pytest
@@ -166,13 +166,13 @@ python -m app.scrubber.cli photo.jpg --mode ai --location --report --out ./clean
 
 ---
 
-## 🔐 Privacy & security notes
+## Privacy & security notes
 - The server binds to `127.0.0.1` **only** — nothing on your LAN can reach it.
 - Uploads are processed **in memory**; cleaned files are only written when you
   choose to download/save them. Originals are never modified.
 - No network calls, ever (no CDNs, no analytics, no model lookups).
 
-## ⚠️ Known limitations
+## Known limitations
 - **HEIC/AVIF/CR3 & vendor RAW**: removing C2PA there is done by in-place
   zeroing / pointer-null because a pure-Python re-muxer would be unsafe;
   files remain valid and decodable, but are best verified in your usual app.
@@ -181,7 +181,7 @@ python -m app.scrubber.cli photo.jpg --mode ai --location --report --out ./clean
 - Extremely large files (> ~300 MB) are refused by default (configurable via
   the `AI_MAX_MB` environment variable).
 
-## ☁️ Deploying to Vercel
+## Deploying to Vercel
 
 The same Flask app runs as a Vercel serverless function. `api/index.py` wraps
 `create_app()` and `vercel.json` routes every path to it.
@@ -218,7 +218,7 @@ deployment necessarily receives the image; it processes it in memory and keeps
 nothing, but that is a weaker promise. Keep the installer as the private
 option and treat the web deployment as the convenient one.
 
-## 📁 Project layout
+## Project layout
 ```
 main.py                     entry point (native window / browser / headless)
 Metavoid.spec    PyInstaller spec (icon, version, pywebview data)

@@ -14,21 +14,21 @@
   .legal-nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
   .legal-nav a {
     color: var(--muted); text-decoration: none; padding: 6px 14px;
-    border-radius: var(--radius-pill); font-size: 13.5px; border: 1px solid transparent;
+    font-size: 13.5px; border: 1px solid transparent;
     transition: all .15s ease;
   }
   .legal-nav a:hover { color: var(--text); background: var(--panel2); }
-  .legal-nav a.active { color: var(--accent); background: var(--accent-soft); border-color: rgba(56, 189, 248, .3); font-weight: 600; }
-  .legal-section { display: none; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; line-height: 1.68; }
+  .legal-nav a.active { color: var(--accent); background: var(--accent-soft); border-color: var(--border-strong); font-weight: 600; }
+  .legal-section { display: none; background: var(--panel); border: 1px solid var(--border); padding: 28px; line-height: 1.68; }
   .legal-section.active { display: block; }
   .legal-section h2 { font-family: var(--font-display); margin: 0 0 16px; font-size: 20px; color: var(--text); letter-spacing: -.2px; }
   .legal-section h3 { font-family: var(--font-display); margin: 24px 0 10px; font-size: 16px; color: var(--accent); letter-spacing: -.1px; }
-  .legal-section p, .legal-section li { color: #d0d7de; font-size: 14.5px; }
+  .legal-section p, .legal-section li { color: #d4d4d8; font-size: 14.5px; }
   .legal-section ul { padding-left: 20px; margin: 10px 0; }
   .legal-section li { margin-bottom: 6px; }
   .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); text-decoration: none; font-size: 14px; margin-bottom: 20px; }
   .back-link:hover { text-decoration: underline; }
-  .audit-badge { display: inline-block; font-family: var(--font-mono); background: rgba(63, 185, 80, .1); border: 1px solid rgba(63, 185, 80, .3); color: var(--green); padding: 3px 10px; border-radius: var(--radius-pill); font-size: 12px; font-weight: 600; margin-bottom: 12px; letter-spacing: .2px; }
+  .audit-badge { display: inline-block; font-family: var(--font-mono); background: rgba(63, 185, 80, .1); border: 1px solid rgba(63, 185, 80, .3); color: var(--green); padding: 3px 10px; font-size: 12px; font-weight: 600; margin-bottom: 12px; letter-spacing: .2px; }
 </style>
 </head>
 <body>
@@ -51,7 +51,7 @@
   <main>
     <!-- 1. Privacy Policy -->
     <article id="sec-privacy" class="legal-section {% if active_tab == 'privacy' %}active{% endif %}">
-      <span class="audit-badge">✔ 100% In-Memory Processing · Zero User Profiling</span>
+      <span class="audit-badge">In-memory processing · no user profiling</span>
       <h2>Privacy Policy</h2>
       <p><em>Last revised: September 2026</em></p>
 
@@ -112,7 +112,7 @@
 
     <!-- 3. Cookie & Storage Policy -->
     <article id="sec-cookies" class="legal-section {% if active_tab == 'cookies' %}active{% endif %}">
-      <span class="audit-badge">✔ Zero Tracking Cookies · Zero Third-Party Analytics</span>
+      <span class="audit-badge">No tracking cookies · no third-party analytics</span>
       <h2>Cookie & Storage Policy</h2>
       <p><em>Last revised: September 2026</em></p>
 
